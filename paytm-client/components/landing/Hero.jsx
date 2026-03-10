@@ -12,7 +12,7 @@ export default function Hero() {
           anyone, <span className="text-blue-600">instantly.</span>
         </h1>
         <p className="text-gray-400 text-base max-w-sm mb-8 leading-relaxed">
-          PayZap lets you transfer money directly to other users using their UPI
+          PayTm lets you transfer money directly to other users using their UPI
           ID. Simple, fast, and secure.
         </p>
         <div className="flex gap-3">

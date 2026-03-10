@@ -6,12 +6,20 @@ import accountRouter from "./routes/account.js";
 import transactionRouter from "./routes/transaction.js";
 import cookieParser from "cookie-parser";
 import { auth } from "./middlewares/auth.js";
+import cors from "cors";
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 await connectDb();
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  }),
+);
 
 app.use(express.json());
 app.use(cookieParser());

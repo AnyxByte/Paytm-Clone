@@ -7,7 +7,7 @@ export default function Navbar() {
     <nav className="fixed top-0 w-full z-50 bg-white border-b border-gray-200 px-6 md:px-16 py-3.5 flex items-center justify-between">
       <div className="flex items-center gap-10">
         <span className="text-lg font-black tracking-tight">
-          Pay<span className="text-blue-600">Zap</span>
+          Pay<span className="text-blue-600">Tm</span>
         </span>
         <div className="hidden md:flex gap-6">
           {["Send Money", "Request", "History"].map((l) => (

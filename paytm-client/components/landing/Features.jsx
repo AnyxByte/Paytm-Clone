@@ -2,7 +2,7 @@ export default function Features() {
   return (
     <section className="max-w-6xl mx-auto px-6 md:px-16 pb-24">
       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">
-        Why PayZap
+        Why PayTm
       </p>
       <div className="grid md:grid-cols-3 gap-4">
         {[
