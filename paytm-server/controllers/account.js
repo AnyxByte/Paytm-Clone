@@ -4,7 +4,15 @@ export const createAccount = async (req, res) => {
   try {
     const user = req.user;
 
-    const account = await Account.create({
+    let account = await Account.findById(user._id);
+
+    if (account) {
+      return res.status(400).json({
+        msg: "Wallet already exists",
+      });
+    }
+
+    account = await Account.create({
       user: user._id,
     });
 
@@ -22,14 +30,24 @@ export const createAccount = async (req, res) => {
 
 export const fetchUserAccounts = async (req, res) => {
   try {
-    const accounts = await Account.find({ user: req.user._id });
+    const account = await Account.findOne({ user: req.user._id });
+
+    if (!account) {
+      return res.status(400).json({
+        msg: "Wallet doesn't exists",
+      });
+    }
+
+    const balance = await account.getBalance();
+
     return res.status(200).json({
-      accounts,
+      account,
+      balance,
     });
   } catch (error) {
     console.log("error at fetchUserAccounts", error);
     return res.status(500).json({
-      msg: "error at fetching user accounts",
+      msg: "error at fetching user wallet",
     });
   }
 };
@@ -53,7 +71,7 @@ export const fetchAccountBalance = async (req, res) => {
 
     return res.status(200).json({
       balance,
-      account : account._id
+      account: account._id,
     });
   } catch (error) {
     console.log("error at fetchAccountBalance", error);
