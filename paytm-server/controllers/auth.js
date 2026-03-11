@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 
 export const handleUserRegister = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone) {
       return res.status(400).json({
         msg: "missing fields",
       });
@@ -24,6 +24,7 @@ export const handleUserRegister = async (req, res) => {
       email,
       name,
       password,
+      phone,
     });
 
     sendEmail(email, "Registration Successful");
@@ -52,6 +53,7 @@ export const handleUserRegister = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
       },
     });
   } catch (error) {

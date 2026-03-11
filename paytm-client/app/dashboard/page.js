@@ -1,6 +1,9 @@
+"use client";
+
 import Sidebar from "@/components/dashboard/Sidebar";
 import BalanceCard from "@/components/dashboard/BalanceCard";
 import Transactions from "@/components/dashboard/Transaction";
+import { useUser } from "@/context/AuthContext";
 // import Transactions from "@/components/dashboard/Transactions";
 
 export default function DashboardPage() {
