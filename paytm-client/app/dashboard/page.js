@@ -7,9 +7,12 @@ import { useUser } from "@/context/AuthContext";
 import Loading from "./loading";
 import { useWallet } from "@/context/WalletContext";
 import Error from "./error";
+import Cookies from "js-cookie";
 
 export default function DashboardPage() {
   const { loading, error } = useWallet();
+  // const { user } = useUser();
+
   const { user } = useUser();
 
   if (error) {
@@ -28,7 +31,9 @@ export default function DashboardPage() {
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">
             Welcome back
           </p>
-          <h1 className="text-2xl font-black tracking-tight">{user?.name}</h1>
+          <h1 className="text-2xl font-black tracking-tight">
+            {user ? user?.name : "unknown"}
+          </h1>
         </div>
 
         {/* Top row */}

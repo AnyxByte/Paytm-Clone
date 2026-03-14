@@ -32,6 +32,7 @@ export default function Login() {
         payload,
       );
       Cookies.set("token", response.data.token);
+      Cookies.set("user", JSON.stringify(response.data?.user));
       setUser(response.data?.user);
 
       toast.success("Successful");

@@ -1,8 +1,10 @@
 "use client";
-import { useUser } from "@/context/AuthContext";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import Cookies from "js-cookie";
+import { User } from "lucide-react";
+import { useUser } from "@/context/AuthContext";
 
 export default function Sidebar() {
   const links = [
@@ -26,9 +28,6 @@ export default function Sidebar() {
   const pathName = usePathname();
 
   const { user } = useUser();
-
-  const name = user?.name || "Anon";
-  const email = user?.email || "anon@anon.com";
 
   return (
     <aside className="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 flex flex-col z-40">
@@ -61,11 +60,15 @@ export default function Sidebar() {
       {/* User */}
       <div className="px-4 py-4 border-t border-gray-100 flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-blue-600 text-white text-sm font-black flex items-center justify-center">
-          {name[0].toUpperCase()}
+          <User size={16} />
         </div>
         <div>
-          <p className="text-sm font-bold leading-none">{name}</p>
-          <p className="text-xs text-gray-400 mt-0.5">{email}</p>
+          <p className="text-sm font-bold leading-none">
+            {user ? user?.name : "unknown"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {user ? user?.email : "unknown"}
+          </p>
         </div>
         <Link
           href="/auth/login"

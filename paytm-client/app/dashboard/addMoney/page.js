@@ -1,13 +1,15 @@
 "use client";
 
+import { useWallet } from "@/context/WalletContext";
 import axios from "axios";
 import Cookies from "js-cookie";
 
 export default function AddMoney() {
   const token = Cookies.get("token");
 
+  const { walletDetails } = useWallet();
+
   const handleAddMoney = async () => {
-    // Step 1 — create order from your Express backend
     const payload = {
       amount: 5,
     };
@@ -21,9 +23,10 @@ export default function AddMoney() {
         },
       },
     );
-    const order = res.data;
+    const order = res.data.order;
 
-    // Step 2 — load Razorpay script dynamically
+    console.log("order", order);
+
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     document.body.appendChild(script);
@@ -39,23 +42,27 @@ export default function AddMoney() {
 
         handler: async (response) => {
           // Step 3 — send to your Express backend to verify
-          const verify = await fetch(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/verify-payment`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
+          console.log("response", response);
+          try {
+            const verify = await axios.post(
+              `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transactions/deposit`,
+              {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-              }),
-            },
-          );
-          const result = await verify.json();
-          if (result.success) {
-            alert("₹500 added to wallet!");
-          } else {
-            alert("Payment failed.");
+                amount: 5,
+                idempotencyKey: order.id,
+                toAccount: walletDetails?.account?._id,
+              },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+            );
+            alert("success");
+          } catch (error) {
+            alert("error");
           }
         },
 
