@@ -7,7 +7,6 @@ import { useUser } from "@/context/AuthContext";
 import Loading from "./loading";
 import { useWallet } from "@/context/WalletContext";
 import Error from "./error";
-// import Transactions from "@/components/dashboard/Transactions";
 
 export default function DashboardPage() {
   const { loading, error } = useWallet();

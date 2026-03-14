@@ -10,9 +10,11 @@ export const WalletProvider = ({ children }) => {
   const [walletDetails, setWalletDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [hasWallet, setHasWallet] = useState(true);
 
   const fetchWalletDetails = async () => {
     const token = Cookies.get("token");
+
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     try {
       const response = await axios.get(`${backendUrl}/api/accounts`, {
@@ -20,9 +22,15 @@ export const WalletProvider = ({ children }) => {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      if (response.data?.account === null) {
+        setHasWallet(false);
+      } else {
+        setHasWallet(true);
+        setWalletDetails(response.data);
+      }
+
       setLoading(false);
-      console.log("response.data", response.data);
-      setWalletDetails(response.data);
     } catch (error) {
       console.log("error at fetchWalletDetails", error);
       setError(true);
@@ -40,6 +48,9 @@ export const WalletProvider = ({ children }) => {
         walletDetails,
         loading,
         error,
+        hasWallet,
+        setHasWallet,
+        setWalletDetails
       }}
     >
       {children}

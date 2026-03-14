@@ -3,6 +3,7 @@ import { sendEmail } from "../config/email.js";
 import { Account } from "../models/account.js";
 import { Ledger } from "../models/ledger.js";
 import { Transaction } from "../models/transaction.js";
+import crypto from "crypto";
 
 export const createTransaction = async (req, res) => {
   const { fromAccount, toAccount, amount, idempotencyKey } = req.body;
@@ -14,7 +15,7 @@ export const createTransaction = async (req, res) => {
 
   // valid user account
 
-  const fromUserAccount = await Account.findOne({
+  const fromSystemAccount = await Account.findOne({
     _id: fromAccount,
   });
 
@@ -22,7 +23,7 @@ export const createTransaction = async (req, res) => {
     _id: toAccount,
   });
 
-  if (!fromUserAccount || !toUserAccount) {
+  if (!fromSystemAccount || !toUserAccount) {
     return res.status(400).json({
       msg: "No user account",
     });
@@ -63,7 +64,7 @@ export const createTransaction = async (req, res) => {
 
   //check account status
   if (
-    fromUserAccount.status !== "ACTIVE" ||
+    fromSystemAccount.status !== "ACTIVE" ||
     toUserAccount.status !== "ACTIVE"
   ) {
     return res.status(500).json({
@@ -72,7 +73,7 @@ export const createTransaction = async (req, res) => {
   }
 
   // sender balance from ledger
-  const balance = await fromUserAccount.getBalance();
+  const balance = await fromSystemAccount.getBalance();
 
   if (balance < amount) {
     return res.status(400).json({
@@ -146,11 +147,25 @@ export const createTransaction = async (req, res) => {
   });
 };
 
-export const createInitialFunds = async (req, res) => {
+export const depositFundsToWallet = async (req, res) => {
   try {
-    const { toAccount, amount, idempotencyKey } = req.body;
+    const {
+      toAccount,
+      amount,
+      idempotencyKey,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    } = req.body;
 
-    if (!toAccount || !amount || !idempotencyKey) {
+    if (
+      !toAccount ||
+      !amount ||
+      !idempotencyKey ||
+      !razorpay_order_id ||
+      !razorpay_payment_id ||
+      !razorpay_signature
+    ) {
       return res.status(400).json({
         msg: "missing fields",
       });
@@ -164,13 +179,26 @@ export const createInitialFunds = async (req, res) => {
       });
     }
 
-    const fromUserAccount = await Account.findOne({
-      user: req.user._id,
-    });
+    const fromSystemAccount = new mongoose.Types.ObjectId(
+      process.env.ADMIN_ACCOUNTID,
+    );
 
-    if (!fromUserAccount) {
+    if (!process.env.ADMIN_ACCOUNTID) {
       return res.status(400).json({
-        msg: "No system user",
+        msg: "No system account configured",
+      });
+    }
+
+    // razorpay validation starts
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY)
+      .update(body)
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        msg: "Invalid payment",
       });
     }
 
@@ -180,7 +208,7 @@ export const createInitialFunds = async (req, res) => {
     const transaction = new Transaction({
       amount,
       toAccount: toUserAccount._id,
-      fromAccount: fromUserAccount._id,
+      fromAccount: fromSystemAccount,
       idempotencyKey,
       status: "PENDING",
     });
@@ -191,7 +219,7 @@ export const createInitialFunds = async (req, res) => {
       [
         {
           amount,
-          account: fromUserAccount._id,
+          account: fromSystemAccount,
           transaction: transaction._id,
           type: "DEBIT",
         },
@@ -222,7 +250,7 @@ export const createInitialFunds = async (req, res) => {
       transaction,
     });
   } catch (error) {
-    console.log("createInitialFunds error:-", error);
+    console.log("depositFundsToWallet error:-", error);
     return res.status(500).json({
       msg: error.message,
     });

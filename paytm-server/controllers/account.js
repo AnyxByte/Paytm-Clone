@@ -4,7 +4,7 @@ export const createAccount = async (req, res) => {
   try {
     const user = req.user;
 
-    let account = await Account.findById(user._id);
+    let account = await Account.findOne({ user: user._id });
 
     if (account) {
       return res.status(400).json({
@@ -17,7 +17,7 @@ export const createAccount = async (req, res) => {
     });
 
     return res.status(201).json({
-      msg: "account created",
+      balance: 0,
       account,
     });
   } catch (error) {
@@ -31,10 +31,12 @@ export const createAccount = async (req, res) => {
 export const fetchUserAccounts = async (req, res) => {
   try {
     const account = await Account.findOne({ user: req.user._id });
+    console.log("account", account);
 
     if (!account) {
-      return res.status(400).json({
+      return res.status(200).json({
         msg: "Wallet doesn't exists",
+        account: null,
       });
     }
 

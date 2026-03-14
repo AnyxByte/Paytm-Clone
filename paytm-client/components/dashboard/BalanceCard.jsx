@@ -10,15 +10,15 @@ import { useWallet } from "@/context/WalletContext";
 import Loading from "@/app/dashboard/loading";
 
 export default function BalanceCard() {
-  const [hasWallet, setHasWallet] = useState(true);
   const { user } = useUser();
-  const { walletDetails, loading } = useWallet();
+  const { walletDetails, loading, hasWallet, setHasWallet, setWalletDetails } =
+    useWallet();
 
   const createWallet = async () => {
     const token = Cookies.get("token");
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     try {
-      await axios.post(
+      const response = await axios.post(
         `${backendUrl}/api/accounts/create`,
         {},
         {
@@ -27,6 +27,7 @@ export default function BalanceCard() {
           },
         },
       );
+      setWalletDetails(response.data);
       setHasWallet(true);
       toast.success("Wallet created");
     } catch (error) {
@@ -57,6 +58,8 @@ export default function BalanceCard() {
       </div>
     );
   }
+
+  console.log("walletDetails", walletDetails);
 
   return (
     <div className="rounded-2xl overflow-hidden shadow-sm h-full flex flex-col">

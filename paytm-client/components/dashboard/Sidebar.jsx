@@ -1,15 +1,29 @@
 "use client";
 import { useUser } from "@/context/AuthContext";
 import Link from "next/link";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
   const links = [
-    { icon: "⊞", label: "Dashboard", active: true },
-    { icon: "+", label: "Add Money", active: false },
-    { icon: "↑", label: "Transfer", active: false },
-    { icon: "◷", label: "History", active: false },
-    { icon: "◎", label: "Profile", active: false },
+    { icon: "⊞", label: "Dashboard", active: true, route: "/dashboard" },
+    {
+      icon: "+",
+      label: "Add Money",
+      active: false,
+      route: "/dashboard/addMoney",
+    },
+    {
+      icon: "↑",
+      label: "Transfer",
+      active: false,
+      route: "/dashboard/transfer",
+    },
+    { icon: "◷", label: "History", active: false, route: "/dashboard/history" },
+    { icon: "◎", label: "Profile", active: false, route: "/dashboard/profile" },
   ];
+
+  const pathName = usePathname();
 
   const { user } = useUser();
 
@@ -29,15 +43,14 @@ export default function Sidebar() {
       <nav className="flex-1 px-3 py-5 flex flex-col gap-1">
         {links.map((l) => (
           <Link
-            key={l.label}
-            href="#"
-            className={[
-              "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition",
-              l.active
-                ? "bg-blue-600 text-white"
-                : "text-gray-500 hover:bg-gray-50 hover:text-black",
-            ].join(" ")}
-            onClick={() => (l.active = true)}
+            key={l.icon}
+            href={`${l.route}`}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition 
+              ${
+                pathName === l.route
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-500 hover:bg-gray-50 hover:text-black"
+              }`}
           >
             <span className="w-5 text-center text-base">{l.icon}</span>
             {l.label}
