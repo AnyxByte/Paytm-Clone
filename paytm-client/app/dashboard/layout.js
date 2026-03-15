@@ -18,11 +18,13 @@ export const metadata = {
 
 export default function Layout({ children }) {
   return (
-    <>
-      <div className="min-h-screen bg-[#f5f7fa] flex">
-        <Sidebar />
-        <div className="flex justify-center flex-1">{children}</div>
+    <div className="min-h-screen bg-[#f5f7fa]">
+      <Sidebar />
+
+      {/* Main Content */}
+      <div className="ml-64 min-h-screen flex items-center justify-center p-6">
+        {children}
       </div>
-    </>
+    </div>
   );
 }

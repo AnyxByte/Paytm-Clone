@@ -50,7 +50,7 @@ export const WalletProvider = ({ children }) => {
         error,
         hasWallet,
         setHasWallet,
-        setWalletDetails
+        setWalletDetails,
       }}
     >
       {children}
@@ -58,4 +58,6 @@ export const WalletProvider = ({ children }) => {
   );
 };
 
-export const useWallet = () => useContext(WalletContext);
+export const useWallet = () => {
+  return useContext(WalletContext);
+};

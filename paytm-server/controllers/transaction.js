@@ -245,9 +245,12 @@ export const depositFundsToWallet = async (req, res) => {
     await session.commitTransaction();
     session.endSession();
 
+    const balance = await toUserAccount.getBalance();
+
     return res.status(201).json({
       msg: "deposited successfully",
       transaction,
+      balance,
     });
   } catch (error) {
     console.log("depositFundsToWallet error:-", error);
