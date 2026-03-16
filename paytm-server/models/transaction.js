@@ -34,6 +34,11 @@ const transactionSchema = new mongoose.Schema(
       required: [true, "Idempotency Key is required"],
       index: true,
     },
+    type: {
+      type: String,
+      enum: ["DEPOSIT", "TRANSFER"],
+      required: true,
+    },
   },
   { timestamps: true },
 );

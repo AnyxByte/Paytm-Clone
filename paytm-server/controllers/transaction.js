@@ -96,6 +96,7 @@ export const createTransaction = async (req, res) => {
             amount,
             idempotencyKey,
             status: "PENDING",
+            type: "TRANSFER",
           },
         ],
         { session },
@@ -205,15 +206,21 @@ export const depositFundsToWallet = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    const transaction = new Transaction({
-      amount,
-      toAccount: toUserAccount._id,
-      fromAccount: fromSystemAccount,
-      idempotencyKey,
-      status: "PENDING",
-    });
-
-    await transaction.save({ session });
+    let transaction = (
+      await Transaction.create(
+        [
+          {
+            amount,
+            toAccount: toUserAccount._id,
+            fromAccount: fromSystemAccount,
+            idempotencyKey,
+            status: "PENDING",
+            type: "DEPOSIT",
+          },
+        ],
+        { session },
+      )
+    )[0];
 
     const debitLedgerEntry = await Ledger.create(
       [
@@ -239,8 +246,11 @@ export const depositFundsToWallet = async (req, res) => {
       { session },
     );
 
-    transaction.status = "COMPLETED";
-    await transaction.save({ session });
+    transaction = await Transaction.findByIdAndUpdate(
+      transaction._id,
+      { status: "COMPLETED" },
+      { session, new: true },
+    );
 
     await session.commitTransaction();
     session.endSession();
@@ -256,6 +266,44 @@ export const depositFundsToWallet = async (req, res) => {
     console.log("depositFundsToWallet error:-", error);
     return res.status(500).json({
       msg: error.message,
+    });
+  }
+};
+
+export const handleGetTransaction = async (req, res) => {
+  try {
+    const { accountId } = req.params;
+
+    const transaction = await Transaction.find({
+      $or: [{ fromAccount: accountId }, { toAccount: accountId }],
+    })
+      .populate({
+        path: "toAccount",
+        populate: {
+          path: "user",
+          model: "user",
+          select: "name email",
+        },
+      })
+      .populate({
+        path: "fromAccount",
+        match: { _id: { $ne: process.env.ADMIN_ACCOUNTID } },
+        populate: {
+          path: "user",
+          model: "user",
+          select: "name email",
+        },
+      })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    return res.status(200).json({
+      transaction,
+    });
+  } catch (error) {
+    console.log("handleGetTransaction error:-", error);
+    return res.status(500).json({
+      msg: "server errror",
     });
   }
 };

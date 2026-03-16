@@ -19,7 +19,7 @@ export default function Sidebar() {
       icon: "↑",
       label: "Transfer",
       active: false,
-      route: "/dashboard/transfer",
+      route: "/dashboard/transferMoney",
     },
     { icon: "◷", label: "History", active: false, route: "/dashboard/history" },
     { icon: "◎", label: "Profile", active: false, route: "/dashboard/profile" },
