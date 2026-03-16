@@ -11,6 +11,7 @@ export const WalletProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [hasWallet, setHasWallet] = useState(true);
+  const [allAccounts, setAllAccounts] = useState([]);
 
   const fetchWalletDetails = async () => {
     const token = Cookies.get("token");
@@ -51,6 +52,8 @@ export const WalletProvider = ({ children }) => {
         hasWallet,
         setHasWallet,
         setWalletDetails,
+        allAccounts,
+        setAllAccounts
       }}
     >
       {children}

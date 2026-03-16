@@ -8,11 +8,12 @@ import Loading from "./loading";
 import { useWallet } from "@/context/WalletContext";
 import Error from "./error";
 import Cookies from "js-cookie";
+import axios from "axios";
+import { useEffect } from "react";
 
 export default function DashboardPage() {
   const { loading, error } = useWallet();
   // const { user } = useUser();
-
   const { user } = useUser();
 
   if (error) {
