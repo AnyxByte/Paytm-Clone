@@ -82,3 +82,24 @@ export const fetchAccountBalance = async (req, res) => {
     });
   }
 };
+
+export const fetchAllAccounts = async (req, res) => {
+  try {
+    const { accountId } = req.params;
+
+    const accounts = await Account.find({
+      _id: {
+        $nin: [process.env.ADMIN_ACCOUNTID, accountId],
+      },
+    }).populate("user", "email name phone");
+
+    return res.status(200).json({
+      accounts,
+    });
+  } catch (error) {
+    console.log("error at fetchAllAccounts", error);
+    return res.status(500).json({
+      msg: "error at fetching all accounts",
+    });
+  }
+};
