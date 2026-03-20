@@ -73,7 +73,7 @@ export const createTransaction = async (req, res) => {
   }
 
   // sender balance from ledger
-  const balance = await fromSystemAccount.getBalance();
+  let balance = await fromSystemAccount.getBalance();
 
   if (balance < amount) {
     return res.status(400).json({
@@ -135,6 +135,7 @@ export const createTransaction = async (req, res) => {
 
     await session.commitTransaction();
     session.endSession();
+    balance = await fromSystemAccount.getBalance();
   } catch (error) {
     console.log("createTransaction error:-", error);
     return res.status(400).json({
@@ -144,7 +145,7 @@ export const createTransaction = async (req, res) => {
 
   return res.status(201).json({
     msg: "transaction completed successfully",
-    transaction: transaction,
+    balance,
   });
 };
 

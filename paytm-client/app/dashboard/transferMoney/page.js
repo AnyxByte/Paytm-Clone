@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import BalanceCard from "@/components/dashboard/BalanceCard";
 import { useWallet } from "@/context/WalletContext";
 import Select from "react-select";
+import toast from "react-hot-toast";
 
 const QUICK_AMOUNTS = [100, 200, 500, 1000];
 
@@ -21,18 +22,17 @@ const formatOptionLabel = (option) => (
 export default function TransferPage() {
   const [selected, setSelected] = useState(null);
   const [amount, setAmount] = useState("");
-  const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(false);
   const token = Cookies.get("token");
-  const { walletDetails, allAccounts, setAllAccounts } = useWallet();
+  const { walletDetails, allAccounts, setAllAccounts, setWalletDetails } =
+    useWallet();
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const fetchAllAccounts = async () => {
     if (!walletDetails?.account?._id) return;
     const token = Cookies.get("token");
-
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
     try {
       const response = await axios.get(
@@ -59,11 +59,44 @@ export default function TransferPage() {
 
   const options = allAccounts.map((acc) => {
     return {
-      value: acc.user.email,
+      value: acc._id,
       label: acc.user.name,
       email: acc.user.email,
     };
   });
+
+  const handleMoneyTransfer = async () => {
+    try {
+      setLoading(true);
+      const token = Cookies.get("token");
+      const payload = {
+        fromAccount: walletDetails?.account?._id,
+        toAccount: selected?.value,
+        amount,
+        idempotencyKey: crypto.randomUUID(),
+      };
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transactions/create`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      setLoading(false);
+      console.log("handleMoneyTransfer", response.data);
+      setWalletDetails((prev) => {
+        return {
+          ...prev,
+          balance: response.data.balance,
+        };
+      });
+      toast.success("Money sent");
+    } catch (error) {
+      setLoading(false);
+      setError(true);
+      console.log("error", error);
+      toast.error("Error sending money");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f5f7fa] px-6 pt-10 pb-20">
@@ -101,6 +134,7 @@ export default function TransferPage() {
                   Search Recipient
                 </label>
                 <Select
+                  instanceId="recipient-select"
                   options={options}
                   value={selected}
                   onChange={setSelected}
@@ -149,7 +183,7 @@ export default function TransferPage() {
 
               {error && (
                 <p className="text-xs text-red-500 font-semibold bg-red-50 border border-red-100 px-4 py-3 rounded-xl">
-                  ⚠ {error}
+                  ⚠ Failed to send
                 </p>
               )}
 
@@ -160,7 +194,7 @@ export default function TransferPage() {
               )}
 
               <button
-                onClick={() => {}}
+                onClick={handleMoneyTransfer}
                 disabled={
                   !selected || !amount || Number(amount) <= 0 || loading
                 }
