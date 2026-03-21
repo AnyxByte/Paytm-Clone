@@ -11,8 +11,16 @@ import Loading from "@/app/dashboard/loading";
 
 export default function BalanceCard() {
   const { user } = useUser();
-  const { walletDetails, loading, hasWallet, setHasWallet, setWalletDetails } =
-    useWallet();
+  const {
+    walletDetails,
+    loading,
+    hasWallet,
+    setHasWallet,
+    setWalletDetails,
+    transactions,
+    debitAmount,
+    creditAmount,
+  } = useWallet();
 
   const createWallet = async () => {
     const token = Cookies.get("token");
@@ -59,8 +67,6 @@ export default function BalanceCard() {
     );
   }
 
-  console.log("walletDetails", walletDetails);
-
   return (
     <div className="rounded-2xl overflow-hidden shadow-sm h-full flex flex-col">
       {/* Balance */}
@@ -86,15 +92,15 @@ export default function BalanceCard() {
         {[
           {
             label: "Sent this month",
-            value: `${walletDetails?.balance === 0 ? 0 : "Unknown"}`,
+            value: `${debitAmount}`,
           },
           {
             label: "Received this month",
-            value: `${walletDetails?.balance === 0 ? 0 : "Unknown"}`,
+            value: `${creditAmount}`,
           },
           {
             label: "Transactions",
-            value: `${walletDetails?.balance === 0 ? 0 : "Unknown"}`,
+            value: `${transactions.length}`,
           },
         ].map((s) => (
           <div key={s.label} className="px-5 py-4">

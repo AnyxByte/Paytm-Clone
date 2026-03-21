@@ -5,8 +5,11 @@ import { usePathname } from "next/navigation";
 import Cookies from "js-cookie";
 import { User } from "lucide-react";
 import { useUser } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Sidebar() {
+  const router = useRouter();
+
   const links = [
     { icon: "⊞", label: "Dashboard", active: true, route: "/dashboard" },
     {
@@ -27,7 +30,14 @@ export default function Sidebar() {
 
   const pathName = usePathname();
 
-  const { user } = useUser();
+  const { user, setUser } = useUser();
+
+  const handleNavigate = () => {
+    setUser(null);
+    router.replace("/auth/login");
+    Cookies.set("token", "");
+    Cookies.set("user", "");
+  };
 
   return (
     <aside className="fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 flex flex-col z-40">
@@ -70,12 +80,12 @@ export default function Sidebar() {
             {user ? user?.email : "unknown"}
           </p>
         </div>
-        <Link
-          href="/auth/login"
+        <button
+          onClick={handleNavigate}
           className="ml-auto text-gray-300 hover:text-red-400 transition text-lg leading-none"
         >
           ⇥
-        </Link>
+        </button>
       </div>
     </aside>
   );

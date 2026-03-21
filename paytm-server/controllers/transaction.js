@@ -260,7 +260,6 @@ export const depositFundsToWallet = async (req, res) => {
 
     return res.status(201).json({
       msg: "deposited successfully",
-      transaction,
       balance,
     });
   } catch (error) {
@@ -275,7 +274,9 @@ export const handleGetTransaction = async (req, res) => {
   try {
     const { accountId } = req.params;
 
-    const transaction = await Transaction.find({
+    const { num } = req.query;
+
+    const query = Transaction.find({
       $or: [{ fromAccount: accountId }, { toAccount: accountId }],
     })
       .populate({
@@ -295,11 +296,16 @@ export const handleGetTransaction = async (req, res) => {
           select: "name email",
         },
       })
-      .sort({ createdAt: -1 })
-      .limit(10);
+      .sort({ createdAt: -1 });
+
+    if (num !== "-1") {
+      query.limit(10);
+    }
+
+    const transaction = await query;
 
     return res.status(200).json({
-      transaction,
+      transaction: transaction,
     });
   } catch (error) {
     console.log("handleGetTransaction error:-", error);

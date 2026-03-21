@@ -51,11 +51,9 @@ export default function TransferPage() {
   };
 
   useEffect(() => {
-    if (!error) {
-      fetchAllAccounts();
-    }
+    fetchAllAccounts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [walletDetails]);
 
   const options = allAccounts.map((acc) => {
     return {

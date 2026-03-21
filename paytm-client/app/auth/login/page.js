@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { useUser } from "@/context/AuthContext";
+import { useWallet } from "@/context/WalletContext";
 
 export default function Login() {
   const {
@@ -14,6 +15,7 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const { fetchWalletDetails } = useWallet();
 
   const router = useRouter();
 
@@ -34,6 +36,7 @@ export default function Login() {
       Cookies.set("token", response.data.token);
       Cookies.set("user", JSON.stringify(response.data?.user));
       setUser(response.data?.user);
+      await fetchWalletDetails();
 
       toast.success("Successful");
       setTimeout(() => {
