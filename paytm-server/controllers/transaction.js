@@ -181,6 +181,12 @@ export const depositFundsToWallet = async (req, res) => {
       });
     }
 
+    if (toUserAccount.status !== "ACTIVE") {
+      return res.status(500).json({
+        msg: "Accounts must be active",
+      });
+    }
+
     if (!process.env.ADMIN_ACCOUNTID) {
       return res.status(400).json({
         msg: "No system account configured",
@@ -349,4 +355,153 @@ export const handleGetTransaction = async (req, res) => {
   }
 };
 
-export const withdrawFunds = async (req, res) => {};
+export const withdrawFunds = async (req, res) => {
+  try {
+    const { fromAccount, idempotencyKey, amount } = req.body;
+
+    if (!fromAccount || !amount || !idempotencyKey) {
+      return res.status(400).json({
+        msg: "missing fields",
+      });
+    }
+
+    // check validity of the fromAccount
+    const fromUserAccount = await Account.findById(fromAccount);
+
+    if (!fromUserAccount) {
+      return res.status(400).json({
+        msg: "No such account",
+      });
+    }
+
+    if (fromUserAccount.status !== "ACTIVE") {
+      return res.status(400).json({
+        msg: "Cannot withdraw funds from unactive account",
+      });
+    }
+
+    if (!process.env.ADMIN_ACCOUNTID) {
+      return res.status(400).json({
+        msg: "No system account configured",
+      });
+    }
+
+    const toSystemAccount = new mongoose.Types.ObjectId(
+      process.env.ADMIN_ACCOUNTID,
+    );
+
+    // check for multiple same transaction
+
+    const isTransactionAlreadyExists = await Transaction.findOne({
+      idempotencyKey,
+    });
+
+    if (isTransactionAlreadyExists) {
+      if (isTransactionAlreadyExists.status === "COMPLETED") {
+        const transactionOccuredBalance = await fromUserAccount.getBalance();
+        return res.status(200).json({
+          msg: "transaction completed",
+          balance: transactionOccuredBalance,
+        });
+      }
+
+      if (isTransactionAlreadyExists.status === "PENDING") {
+        return res.status(200).json({
+          msg: "transaction is pending",
+        });
+      }
+
+      if (isTransactionAlreadyExists.status === "FAILED") {
+        return res.status(500).json({
+          msg: "transaction has failed",
+        });
+      }
+
+      if (isTransactionAlreadyExists.status === "REVERSED") {
+        return res.status(500).json({
+          msg: "transaction has reversed , please try again",
+        });
+      }
+    }
+
+    let balance = await fromUserAccount.getBalance();
+
+    if (balance < amount) {
+      return res.status(400).json({
+        msg: `insufficient amount . Current balance is ${balance}`,
+      });
+    }
+
+    let transaction;
+    try {
+      const session = await mongoose.startSession();
+      session.startTransaction();
+
+      transaction = (
+        await Transaction.create(
+          [
+            {
+              fromAccount,
+              toAccount: toSystemAccount,
+              amount,
+              idempotencyKey,
+              status: "PENDING",
+              type: "WITHDRAW",
+            },
+          ],
+          { session },
+        )
+      )[0];
+
+      const debitLedgerEntry = await Ledger.create(
+        [
+          {
+            account: fromAccount,
+            amount,
+            transaction: transaction._id,
+            type: "DEBIT",
+          },
+        ],
+        { session },
+      );
+
+      const creditLedgerEntry = await Ledger.create(
+        [
+          {
+            account: toSystemAccount,
+            amount,
+            transaction: transaction._id,
+            type: "CREDIT",
+          },
+        ],
+        { session },
+      );
+
+      transaction = await Transaction.findOneAndUpdate(
+        { _id: transaction._id },
+        { status: "COMPLETED" },
+        { session, new: true },
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
+      balance = await fromUserAccount.getBalance();
+    } catch (error) {
+      console.log("withDraw funds error:-", error);
+      return res.status(400).json({
+        msg: "Transaction is Pending due to some issue, please retry after sometime",
+      });
+    }
+
+    return res.status(201).json({
+      msg: "Withdrawn successfully",
+      balance,
+    });
+  } catch (error) {
+    console.log("withdrawFunds error:-", error);
+    return res.status(500).json({
+      msg: error.message,
+    });
+  }
+};
