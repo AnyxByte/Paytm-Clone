@@ -1,9 +1,20 @@
+"use client";
+
 import { useUser } from "@/context/AuthContext";
 import { useWallet } from "@/context/WalletContext";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function Transactions() {
-  const { transactions, setCreditAmount, setDebitAmount } = useWallet();
+  const {
+    transactions,
+    setCreditAmount,
+    setDebitAmount,
+    fetchTransactionDetails,
+  } = useWallet();
+
+  const router = useRouter();
 
   const { user } = useUser();
 
@@ -41,6 +52,11 @@ export default function Transactions() {
     setDebitAmount(debit);
   }, [transactions]);
 
+  const handleViewAllTransaction = async () => {
+    await fetchTransactionDetails(-1);
+    router.push("/dashboard/history");
+  };
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
       {/* Header */}
@@ -48,12 +64,12 @@ export default function Transactions() {
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
           Recent Transactions
         </p>
-        <a
-          href="#"
+        <button
+          onClick={handleViewAllTransaction}
           className="text-xs text-blue-600 font-semibold hover:underline"
         >
           View all
-        </a>
+        </button>
       </div>
 
       {/* List */}
@@ -72,7 +88,9 @@ export default function Transactions() {
               </div>
               <div>
                 <p className="text-sm font-bold">{t.name}</p>
-                <p className="text-xs text-gray-400">{t.handle}</p>
+                <p className="text-xs text-gray-400">
+                  {t.handle} · {t.date}
+                </p>
               </div>
             </div>
             <div className="text-right">
@@ -81,7 +99,6 @@ export default function Transactions() {
               >
                 {t.type === "credit" ? `+ ₹${t.amount}` : `- ₹${t.amount}`}
               </p>
-              <p className="text-xs text-gray-400 mt-0.5">{t.date}</p>
             </div>
           </div>
         ))}

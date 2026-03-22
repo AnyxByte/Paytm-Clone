@@ -25,7 +25,12 @@ export default function Sidebar() {
       route: "/dashboard/transferMoney",
     },
     { icon: "◷", label: "History", active: false, route: "/dashboard/history" },
-    { icon: "◎", label: "Profile", active: false, route: "/dashboard/profile" },
+    {
+      icon: "◎",
+      label: "Withdraw",
+      active: false,
+      route: "/dashboard/withdraw",
+    },
   ];
 
   const pathName = usePathname();

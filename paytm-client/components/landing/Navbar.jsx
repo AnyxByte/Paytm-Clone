@@ -11,13 +11,13 @@ export default function Navbar() {
         </span>
         <div className="hidden md:flex gap-6">
           {["Send Money", "Request", "History"].map((l) => (
-            <a
+            <Link
               key={l}
               href="#"
               className="text-sm text-gray-500 hover:text-black font-medium transition"
             >
               {l}
-            </a>
+            </Link>
           ))}
         </div>
       </div>

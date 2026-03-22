@@ -92,11 +92,11 @@ export default function BalanceCard() {
         {[
           {
             label: "Sent this month",
-            value: `${debitAmount}`,
+            value: `₹ ${debitAmount}`,
           },
           {
             label: "Received this month",
-            value: `${creditAmount}`,
+            value: `₹ ${creditAmount}`,
           },
           {
             label: "Transactions",

@@ -44,7 +44,7 @@ export default function AddMoney() {
           key: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY,
           amount: order.amount,
           currency: "INR",
-          name: "PayZap",
+          name: "PayTm",
           description: "Add money to wallet",
           order_id: order.id,
 
@@ -86,45 +86,47 @@ export default function AddMoney() {
   };
 
   return (
-    <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col">
-      {/* Header */}
-      <div className="bg-blue-600 px-6 py-5 rounded-t-2xl">
-        <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">
-          Wallet
-        </p>
-        <p className="text-white font-black text-lg">Add Money</p>
-      </div>
-
-      {/* Body */}
-      <div className="px-6 py-6 flex flex-col">
-        {/* Amount Label */}
-        <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-          Enter Amount
-        </label>
-
-        {/* Amount Input */}
-        <div className="relative mb-5">
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
-            ₹
-          </span>
-
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0.00"
-            className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-sm font-bold text-black outline-none focus:border-blue-500 focus:bg-white transition"
-          />
+    <div className="flex items-center justify-center w-full mt-10">
+      <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col">
+        {/* Header */}
+        <div className="bg-blue-600 px-6 py-5 rounded-t-2xl">
+          <p className="text-xs font-bold text-blue-200 uppercase tracking-widest mb-1">
+            Wallet
+          </p>
+          <p className="text-white font-black text-lg">Add Money</p>
         </div>
 
-        {/* Pay Button */}
-        <button
-          onClick={handleAddMoney}
-          disabled={!amount || Number(amount) <= 0}
-          className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          Pay ₹{amount || "0"}
-        </button>
+        {/* Body */}
+        <div className="px-6 py-6 flex flex-col">
+          {/* Amount Label */}
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Enter Amount
+          </label>
+
+          {/* Amount Input */}
+          <div className="relative mb-5">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
+              ₹
+            </span>
+
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-8 pr-4 py-3 text-sm font-bold text-black outline-none focus:border-blue-500 focus:bg-white transition"
+            />
+          </div>
+
+          {/* Pay Button */}
+          <button
+            onClick={handleAddMoney}
+            disabled={!amount || Number(amount) <= 0}
+            className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl text-sm hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Pay ₹{amount || "0"}
+          </button>
+        </div>
       </div>
     </div>
   );

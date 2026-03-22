@@ -181,14 +181,48 @@ export const depositFundsToWallet = async (req, res) => {
       });
     }
 
-    const fromSystemAccount = new mongoose.Types.ObjectId(
-      process.env.ADMIN_ACCOUNTID,
-    );
-
     if (!process.env.ADMIN_ACCOUNTID) {
       return res.status(400).json({
         msg: "No system account configured",
       });
+    }
+
+    const fromSystemAccount = new mongoose.Types.ObjectId(
+      process.env.ADMIN_ACCOUNTID,
+    );
+
+    // check whether user is trying multiple times to form the same request
+
+    const isTransactionAlreadyExists = await Transaction.findOne({
+      idempotencyKey,
+    });
+
+    if (isTransactionAlreadyExists) {
+      if (isTransactionAlreadyExists.status === "COMPLETED") {
+        const transactionOccuredBalance = await toUserAccount.getBalance();
+        return res.status(200).json({
+          msg: "transaction completed",
+          balance: transactionOccuredBalance,
+        });
+      }
+
+      if (isTransactionAlreadyExists.status === "PENDING") {
+        return res.status(200).json({
+          msg: "transaction is pending",
+        });
+      }
+
+      if (isTransactionAlreadyExists.status === "FAILED") {
+        return res.status(500).json({
+          msg: "transaction has failed",
+        });
+      }
+
+      if (isTransactionAlreadyExists.status === "REVERSED") {
+        return res.status(500).json({
+          msg: "transaction has reversed , please try again",
+        });
+      }
     }
 
     // razorpay validation starts
@@ -223,7 +257,7 @@ export const depositFundsToWallet = async (req, res) => {
       )
     )[0];
 
-    const debitLedgerEntry = await Ledger.create(
+    await Ledger.create(
       [
         {
           amount,
@@ -235,7 +269,7 @@ export const depositFundsToWallet = async (req, res) => {
       { session },
     );
 
-    const creditLedgerEntry = await Ledger.create(
+    await Ledger.create(
       [
         {
           amount,
@@ -314,3 +348,5 @@ export const handleGetTransaction = async (req, res) => {
     });
   }
 };
+
+export const withdrawFunds = async (req, res) => {};

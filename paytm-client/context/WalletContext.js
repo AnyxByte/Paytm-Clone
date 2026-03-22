@@ -42,7 +42,7 @@ export const WalletProvider = ({ children }) => {
     }
   };
 
-  const fetchTransactionDetails = async () => {
+  const fetchTransactionDetails = async (num = 100) => {
     const token = Cookies.get("token");
     if (!token) return;
 
@@ -51,7 +51,7 @@ export const WalletProvider = ({ children }) => {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
     try {
       const response = await axios.get(
-        `${backendUrl}/api/transactions/${walletDetails?.account?._id}`,
+        `${backendUrl}/api/transactions/${walletDetails?.account?._id}?num=${num}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

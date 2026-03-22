@@ -20,9 +20,7 @@ export default function Layout({ children }) {
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
       <Sidebar />
-
-      {/* Main Content */}
-      <div className="ml-64 min-h-screen flex items-center justify-center p-6">
+      <div className="ml-64 min-h-screen p-8">
         {children}
       </div>
     </div>

@@ -7,6 +7,7 @@ import BalanceCard from "@/components/dashboard/BalanceCard";
 import { useWallet } from "@/context/WalletContext";
 import Select from "react-select";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 const QUICK_AMOUNTS = [100, 200, 500, 1000];
 
@@ -101,17 +102,17 @@ export default function TransferPage() {
       <div className="max-w-5xl mx-auto flex flex-col gap-5">
         {/* Header */}
         <div>
-          <a
+          <Link
             href="/dashboard"
             className="text-xs text-gray-400 font-semibold hover:text-black transition"
           >
             ← Back to Dashboard
-          </a>
+          </Link>
           <h1 className="text-2xl font-black tracking-tight mt-2">
             Send Money
           </h1>
           <p className="text-sm text-gray-400 mt-1">
-            Transfer instantly to any PayZap user
+            Transfer instantly to any PayTm user
           </p>
         </div>
 
