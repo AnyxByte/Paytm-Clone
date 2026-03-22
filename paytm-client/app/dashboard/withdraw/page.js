@@ -5,6 +5,7 @@ import Link from "next/link";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useWallet } from "@/context/WalletContext";
+import toast from "react-hot-toast";
 
 const QUICK_AMOUNTS = [100, 200, 500, 1000];
 
@@ -13,7 +14,7 @@ export default function WithdrawPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const { walletDetails, fetchWalletDetails } = useWallet();
+  const { walletDetails, setWalletDetails } = useWallet();
 
   const balance = walletDetails?.balance ?? 0;
 
@@ -35,7 +36,7 @@ export default function WithdrawPage() {
       setLoading(true);
       const token = Cookies.get("token");
 
-      await axios.post(
+      const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/transactions/withdraw`,
         {
           fromAccount: walletDetails?.account?._id,
@@ -45,11 +46,18 @@ export default function WithdrawPage() {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
-      await fetchWalletDetails();
-      setSuccess(true);
-      setAmount("");
+      console.log("withdraw response", response.data);
+      setWalletDetails((prev) => {
+        return {
+          ...prev,
+          balance: response.data.balance,
+        };
+      });
+
+      toast.success("Withdrawn Successfully");
     } catch (err) {
       setError(err.response?.data?.msg || "Withdrawal failed. Try again.");
+      toast.error("Error");
     } finally {
       setLoading(false);
     }

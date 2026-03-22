@@ -22,12 +22,14 @@ export default function Transactions() {
     const transactionType =
       txs.toAccount.user.email === user.email ? "credit" : "debit";
 
+    const isAdmin = txs?.toAccount?.user?.name === "Admin";
+
     return {
       id: txs._id,
       type: transactionType,
       amount: txs.amount,
-      name: txs?.toAccount?.user?.name,
-      handle: txs?.toAccount?.user?.email,
+      name: isAdmin ? "Withdrawal" : txs?.toAccount?.user?.name,
+      handle: isAdmin ? null : txs?.toAccount?.user?.email,
       date: new Date(txs?.updatedAt).toLocaleDateString("en-IN", {
         day: "numeric",
         month: "short",
