@@ -20,7 +20,7 @@ export default function Transactions() {
 
   const txns = transactions.map((txs) => {
     const transactionType =
-      txs.toAccount.user.email === user.email ? "credit" : "debit";
+      txs.toAccount?.user?.email === user?.email ? "credit" : "debit";
 
     const isAdmin = txs?.toAccount?.user?.name === "Admin";
 
@@ -43,7 +43,7 @@ export default function Transactions() {
     let debit = 0;
 
     transactions.forEach((trxs) => {
-      if (trxs.toAccount.user.email === user.email) {
+      if (trxs.toAccount?.user?.email === user?.email) {
         credit += trxs.amount;
       } else {
         debit += trxs.amount;

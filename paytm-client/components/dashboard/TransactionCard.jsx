@@ -9,7 +9,7 @@ export default function TransactionCard() {
 
   const txns = transactions.map((txs) => {
     const transactionType =
-      txs.toAccount.user.email === user.email ? "credit" : "debit";
+      txs.toAccount?.user?.email === user?.email ? "credit" : "debit";
 
     return {
       id: txs._id,
