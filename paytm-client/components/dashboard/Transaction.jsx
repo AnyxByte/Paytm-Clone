@@ -19,17 +19,34 @@ export default function Transactions() {
   const { user } = useUser();
 
   const txns = transactions.map((txs) => {
-    const transactionType =
-      txs.toAccount?.user?.email === user?.email ? "credit" : "debit";
+    const isCredit = txs.toAccount?.user?.email === user?.email;
+    const isDeposit = txs.type === "DEPOSIT";
+    const isWithdraw = txs.type === "WITHDRAW";
 
-    const isAdmin = txs?.toAccount?.user?.name === "Admin";
+    let name, handle;
+
+    if (isDeposit) {
+      name = "PayTm Deposit";
+      handle = "via Razorpay";
+    } else if (isWithdraw) {
+      name = "Withdrawal";
+      handle = "to Bank Account";
+    } else if (isCredit) {
+      // someone sent money TO you → show sender (fromAccount)
+      name = txs?.fromAccount?.user?.name;
+      handle = txs?.fromAccount?.user?.email;
+    } else {
+      // you sent money to someone → show receiver (toAccount)
+      name = txs?.toAccount?.user?.name;
+      handle = txs?.toAccount?.user?.email;
+    }
 
     return {
       id: txs._id,
-      type: transactionType,
+      type: isCredit ? "credit" : "debit",
       amount: txs.amount,
-      name: isAdmin ? "Withdrawal" : txs?.toAccount?.user?.name,
-      handle: isAdmin ? null : txs?.toAccount?.user?.email,
+      name,
+      handle,
       date: new Date(txs?.updatedAt).toLocaleDateString("en-IN", {
         day: "numeric",
         month: "short",
