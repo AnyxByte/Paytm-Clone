@@ -4,6 +4,10 @@ A full-stack P2P payment application based on Paytm. Users can create wallets, d
 
 ---
 
+## Demo
+
+https://github.com/user-attachments/assets/72c5cff6-7d64-4efd-9799-5edc444b4283
+
 ## Features
 
 - **User Authentication** — Signup, login with JWT-based auth and protected routes
