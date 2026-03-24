@@ -59,7 +59,7 @@ export const WalletProvider = ({ children }) => {
         },
       );
 
-      console.log("fetch transactions", response.data);
+      // console.log("fetch transactions", response.data);
       setTransactions(response.data?.transaction);
     } catch (error) {
       console.log("error at fetchWalletDetails", error);
