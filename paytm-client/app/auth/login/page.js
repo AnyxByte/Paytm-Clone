@@ -68,7 +68,7 @@ export default function Login() {
               </label>
               <input
                 type="text"
-                defaultValue="rohit@gmail.com"
+                placeholder="xxxxx@gmail.com"
                 {...register("email", {
                   required: true,
                 })}
@@ -91,7 +91,7 @@ export default function Login() {
               </div>
               <input
                 type="password"
-                defaultValue="password123"
+                placeholder="password123"
                 {...register("password", {
                   required: true,
                 })}

@@ -66,7 +66,7 @@ export default function Signup() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="Rohit"
+                  placeholder="Rohit"
                   {...register("firstName", {
                     required: true,
                   })}
@@ -80,7 +80,7 @@ export default function Signup() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="Sharma"
+                  placeholder="Sharma"
                   {...register("lastName", {
                     required: true,
                   })}
@@ -100,7 +100,7 @@ export default function Signup() {
                 </span>
                 <input
                   type="tel"
-                  defaultValue="9876543210"
+                  placeholder="9876543210"
                   {...register("phone", {
                     required: true,
                   })}
@@ -117,7 +117,7 @@ export default function Signup() {
               <div className="flex gap-2">
                 <input
                   type="email"
-                  defaultValue="rohit@gmail.com"
+                  placeholder="xxxxx@gmail.com"
                   {...register("email", {
                     required: true,
                   })}
@@ -133,7 +133,7 @@ export default function Signup() {
               </label>
               <input
                 type="password"
-                defaultValue="password123"
+                placeholder="password123"
                 {...register("password", {
                   required: true,
                 })}
@@ -148,7 +148,7 @@ export default function Signup() {
               </label>
               <input
                 type="password"
-                defaultValue="password123"
+                placeholder="password123"
                 {...register("cPassword", {
                   required: true,
                 })}
