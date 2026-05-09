@@ -25,6 +25,12 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/health",(req,res)=>{
+  return res.status(200).json({
+    msg : "server is working fine!"
+  })
+})
+
 app.use("/api/auth", authRouter);
 app.use("/api/accounts", auth, accountRouter);
 app.use("/api/transactions", auth, transactionRouter);
